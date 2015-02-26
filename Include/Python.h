@@ -3,6 +3,7 @@
 /* Since this is a "meta-include" file, no #ifdef __cplusplus / extern "C" { */
 
 /* Include nearly all Python header files */
+int free_lists_enabled;
 
 #include "patchlevel.h"
 #include "pyconfig.h"

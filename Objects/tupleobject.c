@@ -72,7 +72,7 @@ PyTuple_New(Py_ssize_t size)
         return NULL;
     }
 #if PyTuple_MAXSAVESIZE > 0
-    if (size == 0 && free_list[0]) {
+    if (size == 0 && free_list[0] && free_lists_enabled) {
         op = free_list[0];
         Py_INCREF(op);
 #ifdef COUNT_ALLOCS
@@ -80,7 +80,7 @@ PyTuple_New(Py_ssize_t size)
 #endif
         return (PyObject *) op;
     }
-    if (size < PyTuple_MAXSAVESIZE && (op = free_list[size]) != NULL) {
+    if (size < PyTuple_MAXSAVESIZE && (op = free_list[size]) != NULL && free_lists_enabled) {
         free_list[size] = (PyTupleObject *) op->ob_item[0];
         numfree[size]--;
 #ifdef COUNT_ALLOCS
@@ -108,7 +108,7 @@ PyTuple_New(Py_ssize_t size)
     for (i=0; i < size; i++)
         op->ob_item[i] = NULL;
 #if PyTuple_MAXSAVESIZE > 0
-    if (size == 0) {
+    if (size == 0 && free_lists_enabled) {
         free_list[0] = op;
         ++numfree[0];
         Py_INCREF(op);          /* extra INCREF so that this is never freed */
@@ -237,7 +237,8 @@ tupledealloc(PyTupleObject *op)
 #if PyTuple_MAXSAVESIZE > 0
         if (len < PyTuple_MAXSAVESIZE &&
             numfree[len] < PyTuple_MAXFREELIST &&
-            Py_TYPE(op) == &PyTuple_Type)
+            Py_TYPE(op) == &PyTuple_Type &&
+            free_lists_enabled)
         {
             op->ob_item[0] = (PyObject *) free_list[len];
             numfree[len]++;

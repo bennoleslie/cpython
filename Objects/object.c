@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+int free_lists_enabled = 0;
+
 _Py_IDENTIFIER(Py_Repr);
 _Py_IDENTIFIER(__bytes__);
 _Py_IDENTIFIER(__dir__);

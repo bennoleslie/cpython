@@ -381,7 +381,7 @@ new_dict(PyDictKeysObject *keys, PyObject **values)
 {
     PyDictObject *mp;
     assert(keys != NULL);
-    if (numfree) {
+    if (numfree && free_lists_enabled) {
         mp = free_list[--numfree];
         assert (mp != NULL);
         assert (Py_TYPE(mp) == &PyDict_Type);
@@ -1390,7 +1390,7 @@ dict_dealloc(PyDictObject *mp)
         assert(keys->dk_refcnt == 1);
         DK_DECREF(keys);
     }
-    if (numfree < PyDict_MAXFREELIST && Py_TYPE(mp) == &PyDict_Type)
+    if (numfree < PyDict_MAXFREELIST && Py_TYPE(mp) == &PyDict_Type && free_lists_enabled)
         free_list[numfree++] = mp;
     else
         Py_TYPE(mp)->tp_free((PyObject *)mp);
@@ -3868,4 +3868,3 @@ static PyObject _dummy_struct = {
   _PyObject_EXTRA_INIT
   2, &PyDictDummy_Type
 };
-
